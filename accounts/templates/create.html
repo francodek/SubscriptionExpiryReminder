@@ -1,0 +1,10 @@
+{% extends 'index.html'%}
+{% block content %}
+{% load static %}
+{% load bootstrap4 %}
+<form action="/accounts/add_vendor/" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="save the data"/>
+</form>
+{% endblock %}

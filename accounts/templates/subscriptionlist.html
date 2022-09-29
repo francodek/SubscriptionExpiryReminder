@@ -1,0 +1,55 @@
+{% extends 'index.html'%}
+{% block content %}
+{% load static %}
+{% load bootstrap4 %}
+
+<div class="container-fluid">
+	</div>
+	<div class="row">
+		<div class="col-md-10 col-xs-10 col-sm-10"></div>
+		<div class="col-md-2 col-xs-1 col-sm-1">
+			<br/>
+
+				<a href="{% url 'add_subscription' %}">
+            <button type="button" class="btn btn-info">
+		Add New subscription
+	</button>
+            </a>
+		</div>
+	</div>
+	<br/>
+
+    <table>
+  <tr>
+      <th>Subscription Name</th>
+	  <th>Vendor Name</th>
+	  <th>Date subscribed</th>
+	  <th>Expiry date</th>
+  </tr>
+		{% for subscription in subscription_list %}
+		  <tr>
+			  <td>{{ subscription.subscription_name }}</td>
+			  <td>{{ subscription.vendor.vendor_name }}</td>
+			  <td>{{ subscription.date_subscribed }}</td>
+			  <td>{{ subscription.expiry_date }}</td>
+			  <td><a href="{% url 'edit_subscription' subscription.pk %}">
+					<button type="button" class="btn btn-info">
+						<span class="glyphicon glyphicon-pencil"></span>
+					</button>
+				</a>
+
+				  <a href="{% url 'delete_subscription' subscription.pk %}" style="margin-left:10px;">
+					<button type="button" class="btn btn-danger">
+						<span class="glyphicon glyphicon-trash"></span>
+					</button>
+				</a>
+			  </td>
+
+		  </tr>
+		{% endfor %}
+	</table>
+
+
+</div>
+{% endblock %}
+

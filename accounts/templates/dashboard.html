@@ -1,0 +1,18 @@
+{% extends 'index.html'%}
+
+{% block content %}
+    <h1>Welcome, {{user.username}}</h1>
+    <a href="{% url 'logout' %}">Logout</a>
+    <form method="POST" action="  " >
+        {% csrf_token %}
+        {{form}}
+        <input type="submit" name="Add Subscription">
+    </form>
+    {% for Subscription in Subscriptions %}
+        <div>
+            <p>{{Subscription}}</p>
+        </div>
+
+    {% endfor%}
+
+{% endblock %}

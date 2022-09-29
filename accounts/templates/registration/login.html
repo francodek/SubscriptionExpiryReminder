@@ -1,0 +1,19 @@
+{% extends 'index.html'%}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+    <form action="" method="POST" style="display: inline-block; padding: 32px 48px 0px 48px;
+         margin-left:330px; width:40%;">
+        <h1>System Login</h1>
+        <br>
+         {% csrf_token %}
+        {{form.as_p}}
+        <button>Login</button>
+        <hr>
+         <p>Click on <a href="{% url 'register_url' %}">Register</a> if you don't have an account</p>
+    </form>
+
+{% endblock %}
+

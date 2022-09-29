@@ -1,0 +1,10 @@
+{% extends 'index.html'%}
+{% block content %}
+{% load static %}
+{% load bootstrap4 %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="edit the data"/>
+</form>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'index.html'%}
+{% block content %}
+{% load static %}
+{% load bootstrap4 %}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-10 col-xs-10 col-sm-10"></div>
+		<div class="col-md-2 col-xs-1 col-sm-1">
+			<br/>
+            <a href="{% url 'vendor_list' %}">
+
+            </a>
+		</div>
+	</div>
+	<a href="{% url 'add_vendor' %}">
+	<button type="button" class="btn btn-info">
+		Add New Vendor
+	</button></a>
+	<h2 style="text-align: center;">List Of Vendors</h2>
+
+	<table>
+  <tr>
+    <th>Vendor Name</th>
+  </tr>
+		{% for vendor in vendor_list %}
+		  <tr>
+			  <td>{{ vendor.vendor_name }}</td>
+			  <td><a href="{% url 'edit_vendor' vendor.pk %}">
+					<button type="button" class="btn btn-info">
+						<span class="glyphicon glyphicon-pencil"></span>
+					</button>
+				</a>
+
+				  <a href="{% url 'delete_vendor' vendor.pk %}" style="margin-left:10px;">
+					<button type="button" class="btn btn-danger">
+						<span class="glyphicon glyphicon-trash"></span>
+					</button>
+				</a>
+			  </td>
+
+
+		  </tr>
+		{% endfor %}
+
+</table>
+{% endblock %}

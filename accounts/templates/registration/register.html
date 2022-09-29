@@ -1,0 +1,15 @@
+{% extends 'index.html'%}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+    <form action="" method="post" style="display: inline-block; padding: 32px 48px 0px 48px;
+         margin-left:330px; width:40%;">
+        <h1>Create New Account</h1>
+        <br>
+         {% csrf_token %}
+        {{form|crispy}}
+        <button>Register</button>
+    </form>
+{% endblock %}
