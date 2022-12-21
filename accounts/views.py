@@ -6,26 +6,38 @@ from .models import *
 from .forms import *
 from django.views.generic import ListView, DetailView
 from django.utils.decorators import method_decorator
+from django.core.mail import send_mail
+from django.conf import settings
 from django.http import HttpResponseRedirect
+
+
 # Create your views here.
 
 def indexView(request):
-    return render(request,'index.html')
+    if request.method == 'POST':
+        subject = "Test Email"
+        message = "Hello World"
+        send_mail(subject, message, 'francisopogah@gmail.com', ['francisopogah45@gmail.com'])
+
+    return render(request, 'index.html')
+
 
 @method_decorator(login_required, name='dispatch')
 class SubscriptionListView(ListView):
-	template_name='subscriptionlist.html'
-	context_object_name = 'subscription_list'
-	def get_queryset(self):
-		return Subscription.objects.all()
+    template_name = 'subscriptionlist.html'
+    context_object_name = 'subscription_list'
+
+    def get_queryset(self):
+        return Subscription.objects.all()
+
 
 @method_decorator(login_required, name='dispatch')
 class VendorListView(ListView):
-	template_name='vendorlist.html'
-	context_object_name = 'vendor_list'
-	def get_queryset(self):
-		return Vendor.objects.all()
+    template_name = 'vendorlist.html'
+    context_object_name = 'vendor_list'
 
+    def get_queryset(self):
+        return Vendor.objects.all()
 
 
 """@login_required
@@ -43,6 +55,7 @@ def dashboardview(request):
     return render(request,'dashboard.html',context)
     """
 
+
 def registerView(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
@@ -52,6 +65,7 @@ def registerView(request):
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
+
 
 def create_vendor(request):
     # if this is a POST request we need to process the form data
@@ -72,13 +86,15 @@ def create_vendor(request):
 
     return render(request, 'create.html', {'form': form})
 
+
 def edit(request, pk):
-    vendor= get_object_or_404(Vendor, pk=pk)
+    vendor = get_object_or_404(Vendor, pk=pk)
     form = VendorForm(request.POST or None, instance=vendor)
     if form.is_valid():
         form.save()
         return redirect('vendor_list')
-    return render(request, 'edit_vendor.html', {'form':form})
+    return render(request, 'edit_vendor.html', {'form': form})
+
 
 """""
 def delete_vendor(request, pk, vendor_id):
@@ -91,12 +107,14 @@ def delete_vendor(request, pk, vendor_id):
     return redirect(request,'vendor_list')
 """""
 
+
 def delete_vendor(request, pk):
     vendor = get_object_or_404(Vendor, pk=pk)
     if request.method == 'POST':
         vendor.delete()
         return redirect('vendor_list')
     return render(request, 'delete_vendor.html', {'vendor': vendor})
+
 
 def create_subscription(request):
     # if this is a POST request we need to process the form data
@@ -105,10 +123,18 @@ def create_subscription(request):
         form = SubscriptionForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
+            sub_name = form.cleaned_data.get("subscription_name")
+            vendor = form.cleaned_data.get("vendor")
+            date_subscribed = form.cleaned_data.get("date_subscribed")
+            expiry_date= form.cleaned_data.get("expiry_date")
             # process the data in form.cleaned_data as required
             # ...
-            form.save()
+            subject = "Subscription Notification"
+            message = f"Hello, \nYou have successfully subscribed for {sub_name} from " \
+                      f"{vendor} \nDate Subscribed - {date_subscribed} \nExpiration Date - {expiry_date}"
+            send_mail(subject, message, 'francisopogah@gmail.com', ['francisopogah45@gmail.com'])
             # redirect to a new URL:
+            form.save()
             return redirect('subscription_list')
     else:
         form = SubscriptionForm()
@@ -117,12 +143,13 @@ def create_subscription(request):
 
 
 def editsubscription(request, pk):
-    subscription= get_object_or_404(Subscription, pk=pk)
+    subscription = get_object_or_404(Subscription, pk=pk)
     form = SubscriptionForm(request.POST or None, instance=subscription)
     if form.is_valid():
         form.save()
         return redirect('subscription_list')
-    return render(request, 'edit_subscription.html', {'form':form})
+    return render(request, 'edit_subscription.html', {'form': form})
+
 
 def delete_subscription(request, pk):
     subscription = get_object_or_404(Subscription, pk=pk)
@@ -130,3 +157,5 @@ def delete_subscription(request, pk):
         subscription.delete()
         return redirect('subscription_list')
     return render(request, 'delete_subscription.html', {'subscription': subscription})
+
+# sending email
