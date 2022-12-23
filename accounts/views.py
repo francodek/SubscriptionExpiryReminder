@@ -7,25 +7,46 @@ from .forms import *
 from django.views.generic import ListView, DetailView
 from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger #import Paginator
 from django.conf import settings
 from django.http import HttpResponseRedirect
 
 
 # Create your views here.
+"""""
+def indexView(request):
+    SubscriptionListView = Subscription.objects.all()  # queryset containing all movies we just created
+    paginator = Paginator(SubscriptionListView, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    #return render(request=request, template_name="main/movies.html", context={'movies': page_obj})
+
+    return render(request, 'index.html',context={'SubscriptionListView': page_obj})
+"""""
 
 def indexView(request):
-    if request.method == 'POST':
-        subject = "Test Email"
-        message = "Hello World"
-        send_mail(subject, message, 'francisopogah@gmail.com', ['francisopogah45@gmail.com'])
+    subscription_list  = SubscriptionListView.objects.all()
+    page = request.GET.get('page', 1)
 
-    return render(request, 'index.html')
+    paginator = Paginator(subscription_list, 5)
+    try:
+        Subscription = paginator.page(page)
+    except PageNotAnInteger:
+        Subscription = paginator.page(1)
+    except EmptyPage:
+        Subscription = paginator.page(paginator.num_pages)
+
+    return render(request, 'core/user_list.html', { 'Subscription': Subscription })
+
 
 
 @method_decorator(login_required, name='dispatch')
 class SubscriptionListView(ListView):
     template_name = 'subscriptionlist.html'
     context_object_name = 'subscription_list'
+    model = Subscription
+    paginate_by = 5
+    queryset = Subscription.objects.all()  # Default: Model.objects.all()
 
     def get_queryset(self):
         return Subscription.objects.all()
@@ -158,4 +179,5 @@ def delete_subscription(request, pk):
         return redirect('subscription_list')
     return render(request, 'delete_subscription.html', {'subscription': subscription})
 
-# sending email
+# class based views
+

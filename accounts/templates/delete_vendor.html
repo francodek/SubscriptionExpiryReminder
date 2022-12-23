@@ -5,6 +5,8 @@
 <form action="" method="post">
     {% csrf_token %}
     {{ form }}
-    <input type="submit" value="delete the data"/>
+    <div style="text-align: center;">
+  <button style="background-color: gray; color: white; padding: 10px 20px; border: none; border-radius: 5px;">Delete Data</button>
+</div>
 </form>
 {% endblock %}
