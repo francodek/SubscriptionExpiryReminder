@@ -9,7 +9,10 @@ from django.utils.decorators import method_decorator
 from django.core.mail import send_mail
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger #import Paginator
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 from django.http import HttpResponseRedirect
+from .forms import CustomUserCreationForm
 
 
 # Create your views here.
@@ -23,7 +26,7 @@ def indexView(request):
 
     return render(request, 'index.html',context={'SubscriptionListView': page_obj})
 """""
-
+now = timezone.now()
 def indexView(request):
     subscription_list  = SubscriptionListView.objects.all()
     page = request.GET.get('page', 1)
@@ -52,6 +55,8 @@ class SubscriptionListView(ListView):
         return Subscription.objects.all()
 
 
+
+
 @method_decorator(login_required, name='dispatch')
 class VendorListView(ListView):
     template_name = 'vendorlist.html'
@@ -60,6 +65,32 @@ class VendorListView(ListView):
     def get_queryset(self):
         return Vendor.objects.all()
 
+@login_required()
+def expiringsublist(request):
+    no_of_days = request.GET.get('days_left')
+    if no_of_days is not None:
+        days_left = int(no_of_days)
+        expired_subscription_list = Subscription.objects.filter(expiry_date__gte=now.date(),
+                                                                expiry_date__exact=now.date() + timedelta(days=days_left))
+
+        return render(request, 'expired_subscriptionlist.html',
+                      {'expired_subscription_list': expired_subscription_list})
+    expired_subscription_list = Subscription.objects.filter(expiry_date__gte=now.date(),
+                                                            expiry_date__exact=now.date() + timedelta(days=1))
+    return render(request, 'expired_subscriptionlist.html', {'expired_subscription_list': expired_subscription_list})
+
+def send_email(request):
+    if request.method == 'POST':
+        form = request.POST
+        expired_subscription_list = Subscription.objects.filter(expiry_date__gte=now.date(),
+                                                                expiry_date__exact=now.date() + timedelta(days=1))
+        for subscription in expired_subscription_list:
+            if subscription is not None:
+                subject = "Expriy notification"
+                message = f"Your Subscription, {subscription.subscription_name} will be expiring on {subscription.expiry_date}"
+                #to = form.cleaned_data['to']
+                send_mail(subject, message, 'francisopogah@gmail.com', ['francisopogah45@gmail.com', subscription.email])
+        return redirect('expired_subscription_list')
 
 """@login_required
 def dashboardview(request):
@@ -79,12 +110,12 @@ def dashboardview(request):
 
 def registerView(request):
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('login_url')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
 
@@ -147,13 +178,14 @@ def create_subscription(request):
             sub_name = form.cleaned_data.get("subscription_name")
             vendor = form.cleaned_data.get("vendor")
             date_subscribed = form.cleaned_data.get("date_subscribed")
-            expiry_date= form.cleaned_data.get("expiry_date")
+            expiry_date = form.cleaned_data.get("expiry_date")
+            email = form.cleaned_data.get("email")
             # process the data in form.cleaned_data as required
             # ...
             subject = "Subscription Notification"
             message = f"Hello, \nYou have successfully subscribed for {sub_name} from " \
                       f"{vendor} \nDate Subscribed - {date_subscribed} \nExpiration Date - {expiry_date}"
-            send_mail(subject, message, 'francisopogah@gmail.com', ['francisopogah45@gmail.com'])
+            send_mail(subject, message, 'francisopogah@gmail.com', {email})
             # redirect to a new URL:
             form.save()
             return redirect('subscription_list')

@@ -14,6 +14,7 @@ class Subscription(models.Model):
     vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE)
     date_subscribed = models.DateTimeField(null=True, blank=True)
     expiry_date = models.DateTimeField(null=True,blank=True)
+    email = models.EmailField(blank=True, max_length=254)
 
     def __str__(self):
         return self.subscription_name

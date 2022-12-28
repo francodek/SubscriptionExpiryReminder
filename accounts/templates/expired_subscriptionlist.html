@@ -1,0 +1,51 @@
+{% extends 'index.html'%}
+{% block content %}
+{% load static %}
+{% load bootstrap4 %}
+
+<div class="container-fluid">
+	</div>
+
+	<form action="{% url 'expired_subscription_list' %}" method="GET">
+			<label for="days_left">Day Left:</label>
+			<input type="number" id="days_left" name="days_left">
+			<button type="submit">Submit</button>
+		</form>
+    <form action= "{% url 'send_email' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Send Email</button>
+</form>
+	<br>
+    <table>
+  <tr>
+      <th>Subscription Name</th>
+	  <th>Vendor Name</th>
+	  <th>Date subscribed</th>
+	  <th>Expiry date</th>
+  </tr>
+		{% for subscription in expired_subscription_list %}
+		  <tr>
+			  <td>{{ subscription.subscription_name }}</td>
+			  <td>{{ subscription.vendor.vendor_name }}</td>
+			  <td>{{ subscription.date_subscribed }}</td>
+			  <td>{{ subscription.expiry_date }}</td>
+			  <td><a href="{% url 'edit_subscription' subscription.pk %}">
+					<button type="button" class="btn btn-info">
+						<span class="glyphicon glyphicon-pencil"></span>
+					</button>
+				</a>
+
+				  <a href="{% url 'delete_subscription' subscription.pk %}" style="margin-left:10px;">
+					<button type="button" class="btn btn-danger">
+						<span class="glyphicon glyphicon-trash"></span>
+					</button>
+				</a>
+			  </td>
+
+		  </tr>
+		{% endfor %}
+	</table>
+
+</div>
+{% endblock %}
